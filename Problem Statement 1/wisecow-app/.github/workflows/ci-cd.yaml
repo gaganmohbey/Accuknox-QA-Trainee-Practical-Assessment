@@ -1,0 +1,140 @@
+name: CI/CD for Wisecow Application
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to GitHub Container Registry
+        run: |
+          echo "${{ secrets.GIT_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Build Docker image
+        run: |
+          docker build -t ghcr.io/gmohbey/wisecow-app:latest -f docker/Dockerfile .
+
+      - name: Push Docker image
+        run: |
+          docker push ghcr.io/gmohbey/wisecow-app:latest
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Install Kind
+      - name: Install Kind
+        run: |
+          curl -Lo ./kind https://kind.sigs.k8s.io/dl/latest/kind-linux-amd64
+          chmod +x ./kind
+          sudo mv ./kind /usr/local/bin/kind
+
+      # Create Kind cluster
+      - name: Create Kind cluster
+        run: kind create cluster
+
+      # Check cluster info
+      - name: Check Kubernetes cluster info
+        run: kubectl cluster-info --context kind-kind
+
+      # Generate self-signed TLS certificate
+      - name: Generate self-signed TLS certificate
+        run: |
+          openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+          -keyout tls.key \
+          -out tls.crt \
+          -subj "/CN=www.wisecow-app.com/O=wisecow-app Inc./C=IN"  # Replace with your actual domain
+
+      # Create TLS Secret
+      - name: Create TLS Secret
+        run: |
+          kubectl create secret tls wisecow-tls --cert=tls.crt --key=tls.key
+
+      # Deploy to Kind cluster
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f - --validate=false <<EOF
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: wisecow-app
+          spec:
+            replicas: 2
+            selector:
+              matchLabels:
+                app: wisecow
+            template:
+              metadata:
+                labels:
+                  app: wisecow
+              spec:
+                containers:
+                - name: wisecow-app
+                  image: ghcr.io/gmohbey/wisecow-app:latest
+                  ports:
+                  - containerPort: 4499  # Replace with your application's listening port
+                imagePullSecrets:
+                - name: ghcr-secret
+          EOF
+
+      # Expose the Wisecow app as a Service
+      - name: Expose Wisecow App as a Service
+        run: |
+          kubectl apply -f - --validate=false <<EOF
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: wisecow-service
+          spec:
+            selector:
+              app: wisecow
+            ports:
+              - protocol: TCP
+                port: 443  # Expose on HTTPS port
+                targetPort: 4499  # Adjust to the application's listening port
+                nodePort: 30000
+            type: NodePort  # Correct type is 'NodePort'
+          EOF
+
+      # Optionally, create an Ingress for TLS termination
+      - name: Create Ingress for TLS
+        run: |
+          kubectl apply -f - --validate=false <<EOF
+          apiVersion: networking.k8s.io/v1
+          kind: Ingress
+          metadata:
+            name: wisecow-ingress
+            annotations:
+              nginx.ingress.kubernetes.io/ssl-redirect: "true"
+          spec:
+            tls:
+            - hosts:
+              - www.wisecow-app.com  # Replace with your actual domain
+              secretName: wisecow-tls
+            rules:
+            - host: www.wisecow-app.com  # Replace with your actual domain
+              http:
+                paths:
+                - path: /
+                  pathType: Prefix
+                  backend:
+                    service:
+                      name: wisecow-service
+                      port:
+                        number: 443
+          EOF
