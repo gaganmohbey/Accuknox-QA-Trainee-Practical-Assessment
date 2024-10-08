@@ -23,11 +23,11 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ghcr.io/gmohbey/wisecow-app:latest -f docker/Dockerfile .
+          docker build -t ghcr.io/gaganmohbey/wisecow-app:latest -f Accuknox-QA-Trainee-Practical-Assessment/Problem\ Statement\ 1/wisecow-app/Dockerfile .
 
       - name: Push Docker image
         run: |
-          docker push ghcr.io/gmohbey/wisecow-app:latest
+          docker push ghcr.io/gaganmohbey/wisecow-app:latest
 
   deploy:
     needs: build-and-push
@@ -58,83 +58,16 @@ jobs:
           openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
           -keyout tls.key \
           -out tls.crt \
-          -subj "/CN=www.wisecow-app.com/O=wisecow-app Inc./C=IN"  # Replace with your actual domain
+          -subj "/CN=www.wisecow-app.com/O=wisecow-app Inc./C=IN"
 
       # Create TLS Secret
       - name: Create TLS Secret
         run: |
           kubectl create secret tls wisecow-tls --cert=tls.crt --key=tls.key
 
-      # Deploy to Kind cluster
-      - name: Deploy to Kubernetes
+      # Deploy Wisecow Deployment, Service, and Ingress
+      - name: Deploy Wisecow App
         run: |
-          kubectl apply -f - --validate=false <<EOF
-          apiVersion: apps/v1
-          kind: Deployment
-          metadata:
-            name: wisecow-app
-          spec:
-            replicas: 2
-            selector:
-              matchLabels:
-                app: wisecow
-            template:
-              metadata:
-                labels:
-                  app: wisecow
-              spec:
-                containers:
-                - name: wisecow-app
-                  image: ghcr.io/gmohbey/wisecow-app:latest
-                  ports:
-                  - containerPort: 4499  # Replace with your application's listening port
-                imagePullSecrets:
-                - name: ghcr-secret
-          EOF
-
-      # Expose the Wisecow app as a Service
-      - name: Expose Wisecow App as a Service
-        run: |
-          kubectl apply -f - --validate=false <<EOF
-          apiVersion: v1
-          kind: Service
-          metadata:
-            name: wisecow-service
-          spec:
-            selector:
-              app: wisecow
-            ports:
-              - protocol: TCP
-                port: 443  # Expose on HTTPS port
-                targetPort: 4499  # Adjust to the application's listening port
-                nodePort: 30000
-            type: NodePort  # Correct type is 'NodePort'
-          EOF
-
-      # Optionally, create an Ingress for TLS termination
-      - name: Create Ingress for TLS
-        run: |
-          kubectl apply -f - --validate=false <<EOF
-          apiVersion: networking.k8s.io/v1
-          kind: Ingress
-          metadata:
-            name: wisecow-ingress
-            annotations:
-              nginx.ingress.kubernetes.io/ssl-redirect: "true"
-          spec:
-            tls:
-            - hosts:
-              - www.wisecow-app.com  # Replace with your actual domain
-              secretName: wisecow-tls
-            rules:
-            - host: www.wisecow-app.com  # Replace with your actual domain
-              http:
-                paths:
-                - path: /
-                  pathType: Prefix
-                  backend:
-                    service:
-                      name: wisecow-service
-                      port:
-                        number: 443
-          EOF
+          kubectl apply -f Accuknox-QA-Trainee-Practical-Assessment/Problem\ Statement\ 1/wisecow-app/k8s/wisecow-deployment.yaml
+          kubectl apply -f Accuknox-QA-Trainee-Practical-Assessment/Problem\ Statement\ 1/wisecow-app/k8s/wisecow-service.yaml
+          kubectl apply -f Accuknox-QA-Trainee-Practical-Assessment/Problem\ Statement\ 1/wisecow-app/k8s/wisecow-ingress.yaml
