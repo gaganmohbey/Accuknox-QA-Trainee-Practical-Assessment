@@ -23,7 +23,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker buildx build -t ghcr.io/gaganmohbey/wisecow-app:latest -f "Problem Statement 1/wisecow-app/docker/Dockerfile" "Problem Statement 1/wisecow-app/docker/"
+          docker buildx build --load -t ghcr.io/gaganmohbey/wisecow-app:latest -f "Problem Statement 1/wisecow-app/docker/Dockerfile" "Problem Statement 1/wisecow-app/docker/"
 
       - name: Push Docker image
         run: |
