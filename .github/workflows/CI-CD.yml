@@ -21,13 +21,9 @@ jobs:
         run: |
           echo "${{ secrets.GIT_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
-      - name: List repository contents
-        run: |
-          ls -R
-
       - name: Build Docker image
         run: |
-          docker buildx build -t ghcr.io/gaganmohbey/wisecow-app:latest -f "Problem Statement 1/wisecow-app/docker/Dockerfile" .
+          docker buildx build -t ghcr.io/gaganmohbey/wisecow-app:latest -f "Problem Statement 1/wisecow-app/docker/Dockerfile" "Problem Statement 1/wisecow-app/docker/"
 
       - name: Push Docker image
         run: |
