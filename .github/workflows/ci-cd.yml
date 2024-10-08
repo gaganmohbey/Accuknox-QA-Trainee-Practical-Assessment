@@ -23,7 +23,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ghcr.io/gaganmohbey/wisecow-app:latest -f Accuknox-QA-Trainee-Practical-Assessment/Problem\ Statement\ 1/wisecow-app/docker/Dockerfile .
+          docker build -t ghcr.io/gaganmohbey/wisecow-app:latest -f Problem\ Statement\ 1/wisecow-app/docker/Dockerfile .
 
       - name: Push Docker image
         run: |
