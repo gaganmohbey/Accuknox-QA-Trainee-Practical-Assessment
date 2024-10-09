@@ -17,7 +17,7 @@ This document outlines the CI/CD pipeline configuration for deploying the Wiseco
   - `wisecow-deployment.yaml`
   - `wisecow-service.yaml`
   - `wisecow-ingress.yaml`
-- **GitHub Actions Workflow**: `.github/workflows/ci-cd.yaml`
+- **GitHub Actions Workflow**: `.github/workflows/ci-cd-for-wisecow-app.yaml`
 
 ## Workflow Steps
 1. **Code Commit**: Changes are pushed to the `main` branch.
