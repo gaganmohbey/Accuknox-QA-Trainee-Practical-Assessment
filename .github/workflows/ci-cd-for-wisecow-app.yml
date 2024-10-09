@@ -52,7 +52,7 @@ jobs:
       - name: Check Kubernetes cluster info
         run: kubectl cluster-info --context kind-kind
 
-      # Generate self-signed TLS certificate
+      # Generate Self-Signed TLS certificate
       - name: Generate self-signed TLS certificate
         run: |
           openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
