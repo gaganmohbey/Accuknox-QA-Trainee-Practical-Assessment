@@ -12,7 +12,7 @@ This document outlines the CI/CD pipeline configuration for deploying the Wiseco
 
 ## Components
 - **Source Code**: [GitHub Repository](https://github.com/nyrahul/wisecow)
-- **Dockerfile**: Located in the `Problem Statement 1/wisecow-app/` directory.
+- **Dockerfile**: Located in the `Problem Statement 1/wisecow-app/k8s` directory.
 - **Kubernetes Configuration Files**:
   - `wisecow-deployment.yaml`
   - `wisecow-service.yaml`
@@ -54,8 +54,8 @@ This directory contains two Bash scripts designed for health monitoring of a Lin
 ### Command to Run:
 ```bash
 bash system_health_monitor.sh
-
-bash application_health_checker.sh <application_url>
+chmod +x system_health_monitor.sh
+./system_health_monitor.sh
 ```
 
 # Application Health Checker
@@ -77,6 +77,13 @@ The `application_health_checker.sh` script is a Bash script designed to check th
 - The application must be accessible via a valid URL.
 - Ensure that you have execution permissions for the script.
 - Bash shell should be available on the system.
+
+### Command to Run:
+```bash
+bash application_health_checker.sh <application_url>
+chmod +x application_health_checker.sh
+./application_health_checker.sh
+```
 
 ## How to Use
 
