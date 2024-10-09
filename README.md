@@ -84,8 +84,8 @@ The `application_health_checker.sh` script is a Bash script designed to check th
 First, download or clone the repository to access the `application_health_checker.sh` script.
 
 ```bash
-git clone <repository-url>
-
+git clone (https://github.com/gaganmohbey/Accuknox-QA-Trainee-Practical-Assessment.git)
+```
  
 
 
