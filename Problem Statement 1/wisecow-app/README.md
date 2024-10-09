@@ -17,6 +17,7 @@ This document outlines the CI/CD pipeline configuration for deploying the Wiseco
   - `wisecow-deployment.yaml`
   - `wisecow-service.yaml`
   - `wisecow-ingress.yaml`
+  - `tls-secret.yaml`
 - **GitHub Actions Workflow**: `.github/workflows/ci-cd-for-wisecow-app.yaml`
 
 ## Workflow Steps
