@@ -23,7 +23,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker buildx build --load -t ghcr.io/gaganmohbey/wisecow-app:latest -f "Problem Statement 1/wisecow-app/docker/Dockerfile" "Problem Statement 1/wisecow-app/docker/"
+          docker buildx build --load -t ghcr.io/gaganmohbey/wisecow-app:latest -f "Dockerfile" "."
 
       - name: Push Docker image
         run: |
@@ -68,6 +68,6 @@ jobs:
       # Deploy Wisecow Deployment, Service, and Ingress
       - name: Deploy Wisecow App
         run: |
-          kubectl apply -f "Problem Statement 1/wisecow-app/k8s/wisecow-deployment.yaml"
-          kubectl apply -f "Problem Statement 1/wisecow-app/k8s/wisecow-service.yaml"
-          kubectl apply -f "Problem Statement 1/wisecow-app/k8s/wisecow-ingress.yaml"
+          kubectl apply -f "k8s/wisecow-deployment.yaml"
+          kubectl apply -f "k8s/wisecow-service.yaml"
+          kubectl apply -f "k8s/wisecow-ingress.yaml"
