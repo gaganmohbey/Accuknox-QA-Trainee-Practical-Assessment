@@ -27,7 +27,7 @@ This document outlines the CI/CD pipeline configuration for deploying the Wiseco
 5. **Verify Deployment**: Ensure the application is running and accessible.
 
 
-# CI-CD for Wisecow Application
+# CI-CD for Wisecow Application "ACHIEVED GOAL"
 
 This document outlines the CI/CD pipeline for the Wisecow application, detailing the steps for building, pushing, and deploying the Docker image, as well as  wisecow application supports secure TLS communication,deploying the application on a Kubernetes cluster.
 
@@ -173,7 +173,8 @@ chmod +x application_health_checker.sh
 First, download or clone the repository to access the `application_health_checker.sh` script.
 
 ```bash
-git clone (https://github.com/gaganmohbey/Accuknox-QA-Trainee-Practical-Assessment.git)
+git clone https://github.com/gaganmohbey/Accuknox-QA-Trainee-Practical-Assessment.git
+
 ```
  
 
